@@ -1,0 +1,142 @@
+extends adminLayout
+block content
+    include sign
+    include reg
+    script(src="/plupload/plupload.full.min.js")
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100(style="height:20px")
+
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px")
+                if !auth
+                    include signBtn
+                else
+                    ul.userMenu.float-right
+                        li#theFace
+                            img(src=user.face style="width:28px;margin-top:-24px;")
+                        li.amdinMeun
+                            a= user.name
+                    .userCtrl(style="display:none;top:74px")
+                        img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+                        input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+                        p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+                        ul.user-body
+                            li
+                                small 粉丝
+                                small= user.fans.length
+                            li
+                                small 视频
+                                small= small = user.videos.length
+                            li
+                                a(href="/users/admin/follows")
+                                    small 关注
+                                    small= user.follows.length
+                        ul.user-footer(style="margin-top:-25px")
+                            li.float-left
+                                a(href="/users/admin/changeFace")
+                                    button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+                            li.float-right
+                                a(href="/signOut")
+                                    button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+                    script.
+                        $(".userMenu").click(function () {
+                            $(".userCtrl").toggle()
+                        })
+    //.padding-0.adminMenu(style="left:80px")
+    //    ul.nav.nav-pills.nav-stacked.aside
+    //        li.newActive
+    //            a(href="/users/admin/changeFace") 个人中心
+    //        li
+    //            a(href="/users/admin/uploadVideo") 上传视频
+    //        li
+    //            a(href="/users/admin/follows") 我的关注
+    //        if user.identify == "允许直播"
+    //            li
+    //                a(href="/users/admin/addChannel") 添加频道
+    //            li
+    //                a(href="/users/admin/channel") 我的频道
+    .col-md-2.nav.nav-pills.nav-stacked
+        li
+            a(href="/users/admin/changeFace") 个人中心
+        li
+            a(href="/users/admin/uploadVideo") 上传视频
+        li
+            a(href="/users/admin/follows") 我的关注
+        if user.identify == "允许直播"
+            li
+                a(href="/users/admin/addChannel") 添加频道
+            li.active
+                a(href="/users/admin/channel") 我的频道
+
+    //添加频道
+    .container-fluid(ng-controller="channelCtrl")
+        .col-md-9.col-lg-9.padding-0.col-sm-12.col-xs-12
+            .row
+                .col-md-12
+                    .adminTitle
+                        .text 频道修改
+                .col-md-9
+                    .col-md-5.text-algin.margin-top-20
+                        p 频道状态
+                    .col-md-7.margin-top-20
+                        select.form-control(ng-model="channel.state" required)
+                            option 直播
+                            option 已结束
+                            option 未开播
+                            option 重播
+                .hr
+                form.col-md-9(novalidate  name="channelForm")
+                    .col-md-5.text-algin.margin-top-20
+                        p 标题
+                    .col-md-7.margin-top-20
+                        input.form-control(type="text" ng-model="channel.title" required)
+                    .col-md-5.text-algin.margin-top-20
+                        p 公告
+                    .col-md-7.margin-top-20
+                        textarea.form-control(type="text" ng-model="channel.alert" style="height:100px" rows="20" cols="3" wrap="virtual")
+                    .col-md-5.text-algin.margin-top-20
+                        p 类型
+                    .col-md-7.margin-top-20
+                        select.form-control(ng-model="channel.group" required)
+                            option 娱乐
+                            option 会晤
+                            option 医学咨询
+                            option 远程教育
+                            option 云监控
+                    .col-md-5.text-algin.margin-top-20
+                        p 免费/收费
+                    .col-md-7.margin-top-20
+                        select.form-control(ng-model="channel.charge" required)
+                            option 免费
+                            option 收费
+                        .count(ng-if="channel.charge=='收费'")
+                            br
+                            .input-group
+                                span.input-group-btn
+                                    button.btn.btn-default &nbsp&nbsp&nbsp价格&nbsp&nbsp&nbsp
+                                input.form-control(type="number" ng-model="channel.cost" placeholder="填入收费价格" style="text-align:center;")
+                    .col-md-5.text-algin.margin-top-20
+                        p 登录需求
+                    .col-md-7.margin-top-20
+                        select.form-control.btn-btn-default(ng-model="channel.sign" required)
+                            option 不需要
+                            option 需要
+                    .col-md-5.text-algin.margin-top-20
+                        p 上传封面
+                    .col-md-7.margin-top-20
+                        .col-md-7.padding-0
+                            .thumbnail
+                                img#channelPoster(ng-src="{{channel.poster}}")
+                        .col-md-5
+                            button.form-control.btn.btn-default.border-radius-0#uploadPoster 上传封面
+
+                    .col-md-7.col-md-offset-5
+                        button.btn.btn-danger.border-radius-0.margin-top-20.width-100(ng-click="save()"  ng-disabled="!channelForm.$valid") 保存修改
+    script(src="/js/demo.js")
+    script.
+        $(".aside-btn").click(function () {
+            $(".adminMenu").toggle(200)
+        })
+    script.
+        NProgress.done()

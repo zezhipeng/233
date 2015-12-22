@@ -1,0 +1,75 @@
+doctype html
+html(ng-app="app")
+    head
+        link(href="/amazeui/dist/css/amazeui.min.css" rel="stylesheet")
+        link(href="/paper/bootstrap.min.css" rel="stylesheet")
+        link(href="/font-awesome/css/font-awesome.css" rel="stylesheet")
+        link(href="/slider/dist/css/bootstrap-slider.min.css" rel="stylesheet")
+        link(href="/stylesheets/player.css" rel="stylesheet")
+        link(href="/stylesheets/demo.less" rel="stylesheet/less")
+        script(src="/less/dist/less.min.js")
+        script(src="/socket.io/socket.io.js")
+        script(src="/angular/angular.min.js")
+        script(src="/angular/angular-animate.min.js")
+        script(src="/angular-socket/socket.min.js")
+        script(src="/amazeui/dist/js/jquery.min.js")
+        script(src="/amazeui/dist/js/amazeui.min.js")
+        script(src="/amazeui/dist/js/amazeui.ie8polyfill.min.js")
+        script(src="/bootstrap/dist/js/bootstrap.min.js")
+        script(src="/slider/dist/bootstrap-slider.min.js")
+    body(ng-controller="ctrl")
+        br
+        .col-md-7
+            #player
+                video#video
+                    source(src="/admin/sample.mp4")
+                center
+                    i.play.fa.fa-play-circle#playOrPauseLg
+                .danmu(ng-repeat="danmu in messages" ng-style="{top:danmu.top}" ) {{danmu.msg}}
+                #controls
+                    i.fa.fa-play.float-left#playOrPause
+                    i.fa.fa-volume-up.float-left#volume
+                    input#ex1.float-left(data-slider-id='ex1Slider' type="text"  data-slider-min="0" data-slider-max="1" data-slider-step="0.1" data-slider-value="0.7" data-slider-tooltip="hide" value="")
+                    i.float-left#volumeProgressBar
+                    i.fa.fa-expand.float-right#fullScreenOrExit
+                    i.dropup.float-right
+                        span.fa.fa-cog.dropdown-toggle(data-toggle="dropdown" )
+                        ul.dropdown-menu
+                            li
+                                a
+                                    span.fa.fa-bicycle
+                            li
+                                a
+                                    span.fa.fa-car
+                            li
+                                a
+                                    span.fa.fa-rocket
+
+            script(src="/js/player.js")
+            script.
+                player("player","video")
+        .col-md-4
+            .panel.panel-default
+                .panel-heading
+                    h6 chat
+                .panel-body(style="height:277px;overflow: scroll;")
+                    p.text-muted    Diadem:
+                        em(style="color:black") This line of text is meant to be treated as fine print.
+                    p.text-muted(ng-repeat="message in messages ") {{message.user.name}}
+                        em(style="color:black") {{message.msg}}
+                .panel-footer
+                    .input-group
+                        input.form-control(ng-model="_msg")
+                        span.input-group-addon
+                            button.btn.btn-default(ng-click="sendMsg()") 发送
+    script(src="/js/chat.js")
+
+
+
+
+
+
+
+
+
+

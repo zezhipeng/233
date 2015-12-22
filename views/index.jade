@@ -1,0 +1,168 @@
+extends layout
+block content
+  include sign
+  include reg
+  script(src="/video.js/dist/video.js")
+  .navbar.navbar-default.navbar-fixed-top
+      .container-fluid
+          .navbar-header.width-100
+              button.navbar-toggle.collapsed.float-left(data-toggle="collapse" data-target="#nav" style="margin-left:10px;border:0")
+                span.sr-only
+                span.icon-bar
+                span.icon-bar
+                span.icon-bar
+              a.navbar-brand(style="height:100%;" href="/")
+                img(src="/images/logo.jpg" style="height:20px;margin-top:5px")
+              if auth
+                  include userMenu
+              else
+                include signBtn
+  .col-md-3.col-lg-3.padding-0(style="max-width:230px")
+      .collapse.navbar-collapse#nav.padding-0
+          ul.nav.nav-pills.nav-stacked.aside
+              li.newActive
+                a(href="/") 首页
+              li
+                a(href="/watch/list/channels") 热门
+              br
+              li
+                small.header 浏览类别
+              li
+                  a(href="/watch/list/channels/娱乐") 娱乐
+              li
+                  a(href="/watch/list/channels/会晤") 会晤
+              li
+                  a(href="/watch/list/channels/医学咨询") 医学咨询
+
+              li
+                  a(href="/watch/list/channels/远程教育") 远程教育
+              li
+                  a(href="/watch/list/channels/云监控") 云监控
+  .container-fluid(ng-controller="indexCtrl")
+      .col-md-9.col-lg-9.padding-0.col-sm-12.col-xs-12
+          .row
+              .col-md-12.col-lg-12.padding-0.player-content
+
+                      .col-md-8.col-lg-8.col-sm-12.col-xs-12.player.padding-0.flipInX
+                              video.video-js#video(controls preload="auto"   poster="/images/poster.jpg" data-setup="{}")
+                                  source(src="rtmp://222.73.36.73:1935/live/" + index._id type="rtmp/flv")
+                                  source(src="http://222.73.36.73:1935/live/" + index._id + "/playlist.m3u8" type='application/x-mpegURL'  )
+                              script.
+                                 $("#video").width($(".player").width()).height($(".player").width()/16*9)
+                      .col-md-4.device#playList(style="position:relative")
+                          script.
+                              $("#playList").height($(".player").width() / 16 * 9)
+                          button.btn.btn-danger.float-right.margin-top-10#fullScreen
+                             span.fa.fa-expand
+                          .index-group
+                                span.fa.fa-bookmark-o.float-left(style="font-size:30px") &nbsp&nbsp
+                                span(style="font-size:5px;display: inline-block;color:#bbb") 类型&nbsp&nbsp
+                                span(style="font-size:20px;display: inline-block")= index.group
+                          .index-title= index.title
+                          img.index-user(src=index.parent.face)
+                          .index-name= index.parent.name
+                          .index-viewers= index.viewers
+                                 | 人观看
+              .col-xs-12.col-md-12.col-lg-12.padding-0.max-width.col-phone.col-pc(style="overflow:hidden;display:block")
+                    .col-md-12(style="margin-top:40px")
+                            .navTitle.float-left 热门直播
+                            a.more.float-right(href="/watch/list/channels") 更多&nbsp
+                                span.fa.fa-chevron-right
+                    each channel in channels
+                        .col-md.col-lg.padding-0
+                                a.card(href="/live/"+channel.parent.uid)
+                                    .card-body
+                                        img(src=channel.poster)
+                                    .card-footer
+                                        .p1= channel.title
+                                        .p2
+                                            span.fa.fa-youtube-play
+                                            span= channel.parent.name
+                                        .p3
+                                            span.fa.fa-street-view
+                                            span= channel.viewers
+                                script.
+                                    $(".card-body").height($(".card-body").width()/16*9)
+                    .hr
+                    br
+                    .col-md-12
+                            .navTitle.float-left 热门视频
+                            a.more.float-right(href="/watch/list/videos") 更多&nbsp
+                                span.fa.fa-chevron-right
+                    each video in videos
+                        .col-md.col-lg.padding-0
+                              a.card(href="/video/"+video._id)
+                                  .card-body
+                                      img(src=video.poster)
+                                  .card-footer
+                                      .p1= video.title
+                                      .p2
+                                          span.fa.fa-youtube-play
+                                          span= video.parent.name
+                                      .p3
+                                          span.fa.fa-mouse-pointer
+                                          span= video.views
+                    .col-md-12.padding-0
+                            ul.group-content
+                                li.group-card(ng-repeat="group in groups")
+                                    a(href="/watch/list/channels/{{group.name}}")
+                                        img.grouphover(ng-src="{{group.poster}}")
+                                        .group-event
+                    .hr
+                    .col-md-12.padding-0(style="margin-top:25px")
+                        img.img-responsive(src="/images/product.jpg" style="width:100%")
+      .container-fluid.border-top
+        .row
+            .col-md-12
+                .hr
+                .col-md-5.col-sm-12.col-xs-12
+                    br
+                    br
+                    br
+                    img.img-responsive(src="images/btnlogo.png")
+                    h4
+                        small 本站提供广电级直播服务，基于国内外各种先进直播设备
+                .col-md-2.col-sm-6.col-xs-6
+                    br
+                    img(src="images/8cm.jpg" style="width:80%")
+                .col-md-2.col-sm-6.col-xs-6
+                    br
+                    h4
+                        strong 联系方式
+                    h4
+                        small 电话:021-55229560
+                    h4
+                        small 电子邮件
+                .col-md-3.col-sm-6.col-xs-6
+                    br
+                    h4
+                        strong 旗下网站
+                    h4
+                        small 上海港聚信息科技有限公司
+                .col-md-12.border-top.col-sm-12.col-xs-12
+                    h5.text-center
+                        small Copyright © 2013 - 2017 adinno.org All Rights Reserved
+                    h5.text-center
+                        small 上海港聚 版权所有 沪ICP备14010527-2号
+
+  script(src="/js/demo.js")
+  script.
+      videojs("video").ready(function(){
+          var myPlayer = this;
+          myPlayer.width($(".player").width())
+          $("#fullScreen").click(function(){
+              myPlayer.requestFullscreen()
+          })
+      })
+      $(".aside li").click(function(){
+          $(".aside li").removeClass("newActive")
+          $(this).addClass("newActive")
+      })
+
+
+
+
+
+
+
+

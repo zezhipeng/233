@@ -1,0 +1,39 @@
+//
+   Created by Administrator on 2015/11/3.
+//
+   Created by Administrator on 2015/11/3.
+extends layout
+block content
+    include sign
+    include reg
+    script(src="/plupload/plupload.full.min.js")
+    .navbar.navbar-default.navbar-fixed-top(style="box-shadow:0 0 3px rgba(0,0,0,0.08);background-color:#ffffff")
+        .container-fluid
+            .navbar-header.width-100
+                button.btn.btn-default.aside-btn.float-left
+                    span.fa.fa-bars
+                a.navbar-brand(style="height:100%" href="/")
+                    b Demo
+                    span &nbsp&nbsp&nbsp&nbsp&nbsp|
+                if auth
+                    include userMenu
+                else
+                    include signBtn
+    .padding-0.adminMenu
+        ul.nav.nav-pills.nav-stacked.aside
+            li.newActive
+                a(href="/users/admin") 上传视频
+            li
+                a(href="/users/admin/addChannel") 添加频道
+    .col-md-9.col-md-offset-3(ng-controller="lineCtrl")
+        form.col-md-5
+            label.label.label-default 线路名称
+            input.form-control(ng-model="line.name")
+            label.label.label-default 地址
+            input.form-control(ng-model="line.ip")
+            label.label.label-default 线路排序
+            input.form-control(ng-model="line.sort")
+            label.label.label-default 最大限制人数
+            input.form-control(ng-model="line.limit")
+            button.form-control.btn.btn-primary(ng-click="up()") 提交
+    script(src="/js/demo.js")

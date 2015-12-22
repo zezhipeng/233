@@ -1,0 +1,93 @@
+//
+   Created by Administrator on 2015/11/5.
+
+extends layout
+block content
+    link(href="/scrollbar/dist/css/perfect-scrollbar.min.css" rel="stylesheet")
+    script(src="/scrollbar/dist/js/perfect-scrollbar.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/js/demo.js")
+    script.
+        NProgress.start();
+    include header
+    .container(ng-controller="videoCtrl")
+        .row
+            .col-md-8.col-lg-8.col-sm-12.col-xs-12.padding-0
+                //播放器
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.player.player-container.padding-0.box-shadow#videoTag
+                    video#video.video-js(controls   poster="/images/poster.jpg" data-setup="{}")
+                        each line in lines
+                            //source(src="/admin/"+video.parent.name+"/"+video._id )
+                            //source(src="/admin/"+video.parent.name+"/"+video._id+"/playlist.m3u8" type='application/x-mpegURL'  )
+                            source(src=line.rtmp + ":1935/vod/"+video.fileName type="rtmp/flv")
+                            source(src=line.hls + ":1935/vod/" +video.fileName+ "/playlist.m3u8" type='application/x-mpegURL'  )
+                    script.
+                        $("#video").width($(".player").width())
+                        $("#video").height($(".player").width() / 16 * 9 - 2)
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.padding-0.box-shadow.margin-top-10(style="background-color:#ffffff")
+                    .bc-header
+                        .bc-t= video.title
+                        .bc-information
+                            img.bc-f(src=video.parent.face)
+                            .bc-c= video.parent.name
+                            .btn-group(style="height:20px;line-height:10px")
+                                button.btn.btn-danger(style="height:20px;line-height:8px;font-size:10px") 订阅
+                                //button.btn.btn-default(style="height:20px;line-height:8px;font-size:10px")= video.parent.fans
+                    .bc-body
+                        .bc-follow
+                            span.fa.fa-plus
+                            |  添加到
+                        .bc-more
+                            span.fa.fa-info
+                            |  展开
+                        .bc-count= video.views
+                                 |   次观看
+                    script.
+                        $(".bc-more").click(function(){
+                            $("#line").toggle(100)
+                        })
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.padding-0.margin-top-10.box-shadow(style="background-color:#ffffff")
+                    .footer-time= video.createTime
+                                |发布
+                    a.footer-weibo= video.parent.weibo
+                    .footer-alert= video.detail
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.padding-0.margin-top-10.box-shadow(style="background-color:#ffffff")
+                    .comments-content
+                        p.margin-top-10(style="margin-left:20px")
+                            small 所有评论({{comments.length}})
+                        .col-md-12.margin-top-10(style="")
+                            if auth
+                                textarea.form-control.border-radius-0(ng-model="comment" style="height:60px" placeholder="发布公开评论..." )
+                            else
+                                textarea.form-control.border-radius-0(data-target="#sign" data-toggle="modal" style="height:60px" placeholder="发布公开评论..." )
+                            button.btn.btn-warning.float-right.margin-top-10.border-radius-0(ng-click="addComment(comment)") 发布评论
+                        .col-md-12
+                            .comments
+                                .comment-message(ng-repeat="comment in comments | orderBy:'-time'")
+                                    img.comment-face(ng-src="{{comment.user.face}}")
+                                    .comment-name {{comment.user.name}}
+                                    .comment-time {{comment.time|date:'yyyy/MM/dd HH:mm'}}
+                                    .comment-msg {{comment.msg}}
+            .col-md-4.col-lg-4.col-sm-12.col-xs-12.padding
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.padding.box-shadow(style="background-color:#ffffff")
+                    p(style="margin-top:10px")
+                        small 即将播放
+                    each video in videos
+                        .card-min
+                            a(href="/video/" + video._id)
+                                .card-poster
+                                    img(src=video.poster  style="width:100%")
+                                    .card-long= video.size
+                                .card-b
+                                    .card-t= video.title
+                                    .card-n 来自：#{video.parent.name}
+                                    .card-c #{video.views}次观看
+    script(src="/video.js/dist/video.js")
+    script.
+        videoId="#{video._id}"
+    script.
+        NProgress.done()
+
+
+
+

@@ -1,0 +1,37 @@
+//
+   Created by Administrator on 2015/11/3.
+ul.userMenu.float-right
+   li#theFace
+      img.img-circle.img-responsive(src=user.face )
+   li.amdinMeun
+      a= user.name
+.userCtrl(style="display:none")
+   img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+   input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+   p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+   ul.user-body
+      li
+         small 粉丝
+         small= user.fans.length
+      li
+         small 视频
+         small= small= user.videos.length
+      li
+         a(href="/users/admin/follows")
+            small 关注
+            small= user.follows.length
+   ul.user-footer
+      li.float-left
+         a(href="/users/admin/changeFace")
+            button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+      li.float-right
+         a(href="/signOut")
+             button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+script.
+   $(".userMenu").click(function(){
+      $(".userCtrl").toggle()
+   })
+
+   //li
+   //   a(href="/signOut") 注销
+

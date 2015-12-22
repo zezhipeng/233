@@ -1,0 +1,113 @@
+extends layout
+block content
+    script.
+        NProgress.start();
+    include sign
+    include reg
+    script(src="/plupload/plupload.full.min.js")
+    script(src="/video.js/dist/video.js")
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100
+                button.navbar-toggle.collapsed.float-left(data-toggle="collapse" data-target="#nav" style="margin-left:10px;border:0")
+                    span.sr-only
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px;margin-top:5px")
+                if auth
+                    include userMenu
+                else
+                    include signBtn
+
+    .col-md-3.col-lg-3.padding-0(style="max-width:230px")
+        .collapse.navbar-collapse#nav.padding-0
+            ul.nav.nav-pills.nav-stacked.aside
+                li
+                    a(href="/") 首页
+                li.newActive
+                    a(href="/watch/list/channels") 热门
+
+                br
+                li
+                    small.header 浏览类别
+                li
+                    a(href="/watch/list/channels/娱乐") 娱乐
+                li
+                    a(href="/watch/list/channels/会晤") 会晤
+                li
+                    a(href="/watch/list/channels/医学咨询") 医学咨询
+
+                li
+                    a(href="/watch/list/channels/远程教育") 远程教育
+                li
+                    a(href="/watch/list/channels/云监控") 云监控
+    .container-fluid(ng-controller="indexCtrl")
+        .col-md-9.col-lg-9.padding-0.col-sm-12.col-xs-12
+            .row
+                .col-xs-12.col-md-12.col-lg-12.padding-0.max-width.col-phone.col-pc(style="overflow:hidden;display:block")
+                    if collection=="channels"
+                        .col-md-12
+                            .navTitle.float-left= group
+
+                            ul.list-nav
+                                li(style="border-bottom:2px solid#f56954")
+                                    a.color-red(href="/watch/list/channels") 直播
+                                li
+                                    a(href="/watch/list/videos") 视频
+                        each item in cb
+                            .col-md.col-lg.padding-0()
+                                a.card(href="/live/"+item.parent.uid style="float:left")
+                                    .card-body
+                                        img(src=item.poster)
+                                    .card-footer
+                                        .p1= item.title
+                                        .p2
+                                            span.fa.fa-youtube-play
+                                            =item.parent.name
+                                        .p3
+                                            span.fa.fa-street-view
+                                            =item.viewers
+                    if collection=="videos"
+                        .col-md-12
+                            .navTitle.float-left= group
+
+                            ul.list-nav
+                                li
+                                    a(href="/watch/list/channels" ) 直播
+                                li(style="border-bottom:2px solid#f56954")
+                                    a.color-red(href="/watch/list/videos" ) 视频
+                        each item in cb
+                            .col-md.col-lg.padding-0()
+                                a.card(href="/video/" + item._id style="float:left")
+                                    .card-body
+                                        img(src=item.poster)
+                                    .card-footer
+                                        .p1= item.title
+                                        .p2
+                                            span.fa.fa-youtube-play
+                                            =item.parent.name
+                                        .p3
+                                            span.fa.fa-mouse-pointer
+                                            =item.views
+    script(src="/js/demo.js")
+    script.
+        $(".card-body").height($(".card-body").width()/16*9)
+        $(".aside li").click(function(){
+            $(".aside li").removeClass("newActive")
+            $(this).addClass("newActive")
+        })
+        $(".list-nav li a").click(function () {
+            $(".list-nav li a").removeClass("color-red")
+            $(this).addClass("color-red")
+        })
+    script.
+        NProgress.done()
+
+
+
+
+
+
+

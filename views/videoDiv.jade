@@ -1,0 +1,11 @@
+.col-md-12.col-lg-12.col-sm-12.col-xs-12.margin-top-10.padding.box-shadow(style="background-color:#ffffff;")
+    each video in videos
+        .card-min
+            a(href="/video/"+video._id)
+                .card-poster
+                    img(src=video.poster  style="width:100%")
+                    .card-long= video.size
+                .card-b
+                    .card-t= video.title
+                    .card-n 来自：#{live.name}
+                    .card-c #{video.views}次观看W

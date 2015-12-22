@@ -1,0 +1,88 @@
+extends layout
+block content
+    link(href="/scrollbar/dist/css/perfect-scrollbar.min.css" rel="stylesheet")
+    script(src="/scrollbar/dist/js/perfect-scrollbar.js")
+
+
+    include header
+    script.
+        NProgress.start();
+    .container( ng-controller="liveCtrl"  )
+        .row
+            .col-md-8.col-lg-8.col-sm-12.col-xs-12.padding-0
+                //播放器
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.player.player-container.padding-0.box-shadow#videoTag
+                    video#video.video-js(controls   poster="/images/poster.jpg" data-setup="{}")
+                        each line in lines
+                            source(src=line.rtmp + ":1935/live/" + channelId type="rtmp/flv")
+                            source(src=line.hls + ":1935/live/" + channelId + "/playlist.m3u8" type='application/x-mpegURL'  )
+                    script.
+                        $("#video").width($(".player").width())
+                        $("#video").height($(".player").width() / 16 * 9 - 2)
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.margin-top-10.padding-0.box-shadow(style="background-color:#ffffff")
+                    .bc-header
+                        .bc-t {{live.channels.title}}
+                        .bc-information
+                            img.bc-f(ng-src="{{live.face}}")
+                            .bc-c {{live.name}}
+                            .btn-group(style="height:20px;line-height:10px")
+                                button.btn.btn-danger(style="height:20px;line-height:8px;font-size:10px") {{live.channels.state}}
+                                button.btn.btn-default(style="height:20px;line-height:8px;font-size:10px")  {{live.channels.charge}}
+                    .bc-body
+                        .bc-follow(ng-click="addFollow(live.channels._id)")
+                            span.fa.fa-plus
+                            |  关注
+                        .bc-more
+                            span.fa.fa-info
+                            |  展开
+                        .bc-count {{live.channels.viewers+1}}人正在看
+                    script.
+                        $(".bc-more").click(function () {
+                            $("#line").toggle(100)
+                        })
+                .col-md-12.col-lg-12.col-sm-12.col-xs-12.margin-top-10.padding-0.box-shadow(style="background-color:#ffffff")
+                    .footer-time 创建时间：{{live.channels.createTime|date:'yyyy/MM/dd HH:mm'}}
+                    .footer-alert#alert(ng-bind-html="live.channels.alert")
+                    a.footer-weibo {{live.weibo}}
+                //聊天
+            .col-md-4.col-lg-4.col-sm-12.col-xs-12.padding
+                include chatDiv
+                include videoDiv
+    script.
+        uid = "#{uid}"
+    script(src="/js/demo.js")
+    script(src="/video.js/dist/video.js")
+    if channels.sign == "需要"
+        if !auth
+            script.
+                videojs("video").ready(function () {
+                    var myPlayer = this;
+                    myPlayer.one("play", function () {
+                        setTimeout(function () {
+                            myPlayer.pause()
+                            var sign = confirm("请先登陆")
+                            if (sign) {
+                                myPlayer.exitFullScreen()
+                                $("#sign").modal("show")
+                            }
+                            else {
+                                myPlayer.exitFullScreen()
+                                $("#sign").modal("show")
+                            }
+
+                        }, 1000)
+                    })
+                    setInterval(function () {
+                        alert("更多精彩内容请登录后观看")
+                        myPlayer.src("");
+                        $("#sign").modal("show")
+                    }, 1000 * 60)
+                })
+    script.
+        NProgress.done()
+
+
+
+
+
+

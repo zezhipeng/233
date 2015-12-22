@@ -1,0 +1,34 @@
+//
+   Created by Administrator on 2015/10/13.
+.modal.fade.on#reg(ng-controller="regCtrl")
+   .modal-dialog(style="max-width:400px；")
+      .modal-content
+         .modal-header
+            .login-box-msg
+               center
+                  img(src="/images/logo.jpg" style="width:120px")
+         .modal-body(style="padding:0 30px;background-color:#f5f5f5;")
+            center
+               br
+               h5 注册
+            .register-box-body
+               form(novalidate name="regForm" )
+                  label.label.label-default(ng-show="error") {{error}}
+                  .form-group.has-feedback
+                     input.form-control(placeholder="用户名" type="text" name="name" ng-model="regData.name"  required)
+                     span.fa.fa-user.form-control-feedback(style="margin-top:0")
+                  .form-group.has-feedback
+                     input.form-control(placeholder="密码6-20位" type="password" name="password" ng-model="regData.password" ng-minlength="6" ng-maxlength="20" required)
+                     span.fa.fa-lock.form-control-feedback(style="margin-top:0")
+                  .form-group.has-feedback
+                     input.form-control(placeholder="邮箱" type="email" name="email" ng-model="regData.Email" required)
+                     span.fa.fa-envelope.form-control-feedback(style="margin-top:0")
+                  .form-group.has-feedback
+                     input.form-control(placeholder="电话" type="text" name="number" ng-model="regData.phone" ng-pattern="/0?(13|14|15|17|18)[0-9]{9}/"  required)
+                     span.fa.fa-mobile-phone.form-control-feedback(style="margin-top:0")
+         .modal-footer(style="background-color:#f5f5f5")
+            .col-md-8.col-xs-12
+               a.link-black.float-left(data-target="#sign" data-toggle="modal"  data-dismiss="modal")
+                  small 返回登录
+            .col-xs-12.col-md-4
+               button(class="btn btn-primary btn-block btn-flat"  ng-disabled="regForm.$invalid"   ng-click="reg()") 注册

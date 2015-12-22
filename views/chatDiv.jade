@@ -1,0 +1,21 @@
+.col-md-12.col-lg-12.col-sm-12.col-xs-12.chat-content.box-shadow
+    .input-group.send-msg
+        input.form-control.border-radius-0(placeholder="说点什么吧" ng-model="msg"  ng-keyup="$event.keyCode==13 && sendMsg(msg)" disabled=!auth)
+        .input-group-btn
+            button.btn.btn-danger.border-radius-0(ng-click="sendMsg(msg)") 发送
+    .chat-messages#chat-messages
+        center
+            .system(ng-repeat="msg in bc " style="opacity:0.7")
+                h6 {{msg}}
+        .chat-message(ng-repeat="message in messages")
+            img.chat-face(ng-src="{{message.user.face}}")
+            .chat-name(ng-bind="message.user.name")
+            .chat-msg(ng-bind="message.msg")
+        if !auth
+            button.btn.btn-primary.border-radius-0.signPls(data-target="#sign" data-toggle="modal") 登录后参与聊天
+    script.
+        var container = document.getElementById('chat-messages');
+        Ps.initialize(container);
+        var height = $(".player-container").height() + 20
+        $("#chat-messages").css({'height': height})//
+

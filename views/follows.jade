@@ -1,0 +1,103 @@
+extends adminLayout
+block content
+    include sign
+    include reg
+    script(src="/plupload/plupload.full.min.js")
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100(style="height:20px")
+
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px")
+                if !auth
+                    include signBtn
+                else
+                    ul.userMenu.float-right
+                        li#theFace
+                            img(src=user.face style="width:28px;margin-top:-24px;")
+                        li.amdinMeun
+                            a= user.name
+                    .userCtrl(style="display:none;top:74px")
+                        img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+                        input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+                        p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+                        ul.user-body
+                            li
+                                small 粉丝
+                                small= user.fans.length
+                            li
+                                small 视频
+                                small= small = user.videos.length
+                            li
+                                a(href="/users/admin/follows")
+                                    small 关注
+                                    small= user.follows.length
+                        ul.user-footer(style="margin-top:-25px")
+                            li.float-left
+                                a(href="/users/admin/changeFace")
+                                    button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+                            li.float-right
+                                a(href="/signOut")
+                                    button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+                    script.
+                        $(".userMenu").click(function () {
+                            $(".userCtrl").toggle()
+                        })
+    //.padding-0.adminMenu(style="left:80px")
+    //    ul.nav.nav-pills.nav-stacked.aside
+    //        li.newActive
+    //            a(href="/users/admin/changeFace") 个人中心
+    //        li
+    //            a(href="/users/admin/uploadVideo") 上传视频
+    //        li
+    //            a(href="/users/admin/follows") 我的关注
+    //        if user.identify == "允许直播"
+    //            li
+    //                a(href="/users/admin/addChannel") 添加频道
+    //            li
+    //                a(href="/users/admin/channel") 我的频道
+    .col-md-2.nav.nav-pills.nav-stacked
+        li
+            a(href="/users/admin/changeFace") 个人中心
+        li
+            a(href="/users/admin/uploadVideo") 上传视频
+        li.active
+            a(href="/users/admin/follows") 我的关注
+        if user.identify == "允许直播"
+            li
+                a(href="/users/admin/addChannel") 添加频道
+            li
+                a(href="/users/admin/channel") 我的频道
+    .col-md-9(ng-controller="accountCtrl")
+        .row
+            .col-md-12
+                .adminTitle
+                    .text 我的关注
+            .col-xs-12.col-md-12.col-lg-12.padding-0.max-width.col-phone.col-pc(style="overflow:hidden;display:block")
+                    each item in follows
+                        .col-md.col-lg.padding-0()
+                            a.card(href="/live/" + item.uid style="float:left")
+                                .card-body(style="position:relative")
+                                    img(src=item.channels.poster)
+                                    .state= item.channels.state
+                                .card-footer
+                                    .p1= item.channels.title
+                                    .p2
+                                        span.fa.fa-youtube-play
+                                        =item.name
+                                    .p3
+                                        span.fa.fa-street-view
+                                        =item.channels.viewers
+            script(src="/js/demo.js")
+            script.
+                $(".card-body").height($(".card-body").width() / 16 * 9)
+                $(".aside li").click(function () {
+                    $(".aside li").removeClass("newActive")
+                    $(this).addClass("newActive")
+                })
+                $(".list-nav li a").click(function () {
+                    $(".list-nav li a").removeClass("color-red")
+                    $(this).addClass("color-red")
+                })
+    script.
+        NProgress.done()

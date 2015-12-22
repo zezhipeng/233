@@ -1,0 +1,164 @@
+//
+   Created by Administrator on 2015/11/4.
+
+extends adminLayout
+block content
+    include sign
+    include reg
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100(style="height:20px")
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px")
+                if !auth
+                    include signBtn
+                else
+                    ul.userMenu.float-right
+                        li#theFace
+                            img(src=user.face style="width:28px;margin-top:-24px;")
+                        li.amdinMeun
+                            a= user.name
+                    .userCtrl(style="display:none;top:51px")
+                        img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+                        input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+                        p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+                        ul.user-body
+                            li
+                                small 粉丝
+                                small= user.fans.length
+                            li
+                                small 视频
+                                small= small = user.videos.length
+                            li
+                                a(href="/users/admin/follows")
+                                    small 关注
+                                    small= user.follows.length
+                        ul.user-footer(style="margin-top:-23px")
+                            li.float-left
+                                a(href="/users/admin/changeFace")
+                                    button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+                            li.float-right
+                                a(href="/signOut")
+                                    button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+                    script.
+                        $(".userMenu").click(function () {
+                            $(".userCtrl").toggle()
+                        })
+    .col-md-2.nav.nav-pills.nav-stacked
+        li.active
+            a(href="/users/admin/changeFace") 个人中心
+        li
+            a(href="/users/admin/uploadVideo") 上传视频
+        li
+            a(href="/users/admin/follows") 我的关注
+        if user.identify == "允许直播"
+            li
+                a(href="/users/admin/addChannel") 添加频道
+            li
+                a(href="/users/admin/channel") 我的频道
+
+    .col-md-9(ng-controller="accountCtrl")
+        .row
+            ul.nav.nav-tabs.col-md-12
+                li.active
+                    a(href="#home" data-toggle="tab") 个人设置
+                li
+                    a(href="#tab2" data-toggle="tab") 密码设置
+                li
+                    a(href="#vidoes" data-toggle="tab") 我的视频
+                li
+                    a(href="#fans" data-toggle="tab") 我的粉丝
+
+            .tab-content.col-md-12.padding-0
+                ng-form.tab-pane.active.col-md-9#home(name="admin" novalidate )
+                    .col-md-5.text-algin.margin-top-20
+                        p 用户名
+                    .col-md-7.margin-top-20
+                        input.form-control(value=user.name disabled=true)
+                    .col-md-5.text-algin.margin-top-20
+                        p 邮箱
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.Email")
+                    .col-md-5.text-algin.margin-top-20
+                        p 电话
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.phone")
+                    .col-md-5.text-algin.margin-top-20
+                        p 注册时间
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.regTime|date:'yyyy/MM/dd HH:mm'" disabled=true )
+                    .col-md-5.text-algin.margin-top-20
+                        p 头像
+                    .col-md-7.margin-top-20
+                        .col-md-4.padding-0
+                            .thumbnail
+                                img#face(src=user.face)
+                        .col-md-8
+                            button.width-100.btn.btn-default.border-radius-0#uploadFace(style="margin-top:5px") 点击上传头像
+                    .col-md-5.text-algin.margin-top-20
+                        p 地址
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.address")
+                    .col-md-5.text-algin.margin-top-20
+                        p 微博
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.weibo" ng-pattern=)
+                    .col-md-5.text-algin.margin-top-20
+                        p 身份证号码
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.IdCard" type="number"  ng-minLength="15" ng-maxLength="18"   disabled=true)
+                    .col-md-5.text-algin.margin-top-20
+                        p 直播间串流码
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.channels._id"  disabled=true)
+                    .col-md-5.text-algin.margin-top-20
+                        p 直播间地址
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.uid" disabled=true)
+                    .col-md-4.col-md-offset-8
+                        button.btn.btn-warning.border-radius-0.width-100.margin-top-20(ng-click="save()") 保存
+                ng-form.tab-pane.col-md-8#tab2(name="CPassword" novalidate )
+                    .col-md-5.text-algin.margin-top-20
+                        p 原密码
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.oldPwd"  type="password")
+                    .col-md-5.text-algin.margin-top-20
+                        p 新密码
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.Pwd" type="password" )
+                    .col-md-5.text-algin.margin-top-20
+                        p 新密码
+                    .col-md-7.margin-top-20
+                        input.form-control(ng-model="user.rePwd"  type="password")
+                    .col-md-4.col-md-offset-8
+                        button.btn.btn-warning.border-radius-0.width-100.margin-top-20(ng-click="savePwd()") 保存
+                #vidoes.tab-pane.col-md-12
+                    .col-md.col-lg.padding-0(ng-repeat="video in user.videos|orderBy:'-createTime'" style="position:relative")
+                        button.btn.btn-danger(style="font-size:10px;position:absolute;right:8px;top:8px;z-index:33;" ng-click="remove(video._id)")
+                            span.fa.fa-trash.float-right
+                        a.card(href="/video/{{video._id}}" style="position:relative;z-index:2")
+                            .card-body(style="position:relative;z-index:2")
+                                img(ng-src="{{video.poster}}")
+                            .card-footer
+                                .p1(ng-bind="video.title")
+                                .p2
+                                    span.fa.fa-youtube-play
+                                    span(ng-bind="user.name")
+                                .p3
+                                    span.fa.fa-mouse-pointer
+                                    span(ng-bind="video.views")
+                #fans.tab-pane.col-md-11
+                    .col-md-4.margin-top-10(ng-repeat="fan in user.fans")
+                            .col-md-5.col-xs-5
+                                img.img-responsive(ng-src="{{fan.face}}" style="width:80px")
+                            .col-md-7.col-xs-7
+                                h5.text-primary {{fan.name}}
+                                h6.text-muted {{fan.regTime|date:'yyyy/MM/dd HH:mm'}}
+
+    script(src="/plupload/plupload.full.min.js")
+    script.
+            $(".aside-btn").click(function () {
+                $(".adminMenu").toggle(200)
+            })
+    script.
+        NProgress.done()

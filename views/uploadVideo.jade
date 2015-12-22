@@ -1,0 +1,144 @@
+//
+   Created by Administrator on 2015/11/3.
+extends adminLayout
+block content
+    include sign
+    include reg
+    script(src="/plupload/plupload.full.min.js")
+    script(src="/filesize/jquery.filesize.min.js")
+    script(src="/js/demo.js")
+
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100(style="height:20px")
+
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px")
+                if !auth
+                    include signBtn
+                else
+                    ul.userMenu.float-right
+                        li#theFace
+                            img(src=user.face style="width:28px;margin-top:-24px;")
+                        li.amdinMeun
+                            a= user.name
+                    .userCtrl(style="display:none;top:51px")
+                        img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+                        input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+                        p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+                        ul.user-body
+                            li
+                                small 粉丝
+                                small= user.fans.length
+                            li
+                                small 视频
+                                small= small = user.videos.length
+                            li
+                                a(href="/users/admin/follows")
+                                    small 关注
+                                    small= user.follows.length
+                        ul.user-footer(style="margin-top:-23px")
+                            li.float-left
+                                a(href="/users/admin/changeFace")
+                                    button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+                            li.float-right
+                                a(href="/signOut")
+                                    button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+                    script.
+                        $(".userMenu").click(function () {
+                            $(".userCtrl").toggle()
+                        })
+    .col-md-2.nav.nav-pills.nav-stacked
+        li
+            a(href="/users/admin/changeFace") 个人中心
+        li.active
+            a(href="/users/admin/uploadVideo") 上传视频
+        li
+            a(href="/users/admin/follows") 我的关注
+        if user.identify == "允许直播"
+            li
+                a(href="/users/admin/addChannel") 添加频道
+            li
+                a(href="/users/admin/channel") 我的频道
+    .col-md-10(ng-controller="uploadVideoCtrl")
+      .row
+         .col-md-12
+              .adminTitle
+                  .text 上传视频
+         form.col-md-9(name="videoForm")
+             .col-md-5.text-algin.margin-top-20
+                 p 上传视频
+             .col-md-7.margin-top-20
+                 .col-md-7.padding-0(style="position:relative")
+                     .thumbnail
+                         img#videoPoster(alt="" src="/images/poster.jpg" )
+                     .progress.border-radius-0.progress-striped.active(style="height:5px;")
+                         .progress-bar.progress-bar-warning#progress
+                 .col-md-5
+                     button.btn.btn-primary.border-radius-0#uploadVideoBtn(style="width:100%;") 上传视频
+                     #progress-detail.margin-top-20(style="display:none")
+                         span.loaded(style="color:#666;font-size:10px")
+                         span /
+                         span.origSize(style="color:#666;font-size:10px")
+                         br
+                         span.bytesPerSec.text-primary(style=";font-size:30px")
+                         br
+                         span.percent(style="color:#666;font-size:20px")
+             .col-md-5.text-algin.margin-top-20
+                 p 视频标题
+             .col-md-7.margin-top-20
+                input.form-control(ng-model="video.title" placeholder="")
+             .col-md-5.text-algin.margin-top-20
+                 p 类型选择
+             .col-md-7.margin-top-20
+                 select.form-control.btn-btn-default(ng-model="video.group" required)
+                         option 娱乐
+                         option 会晤
+                         option 医学咨询
+                         option 远程教育
+                         option 云监控
+
+             .col-md-5.text-algin.margin-top-20
+                 p 公开/隐藏
+             .col-md-7.margin-top-20
+                 select.form-control.btn-btn-default(ng-model="video.public" required)
+                         option 公开
+                         option 隐藏
+
+             .col-md-5.text-algin.margin-top-20
+                 p 视频详情
+             .col-md-7.margin-top-20
+                 textarea.form-control(ng-model="video.detail" placeholder="" style="height:80px")
+             .col-md-7.col-md-offset-5.margin-top-20
+                button.btn.btn-primary.border-radius-0(style="width:100%;" ng-click="save()"  ng-disabled="!videoForm.$valid") 保存
+
+    script.
+        $(".aside-btn").click(function () {
+            $(".adminMenu").toggle(200)
+        })
+
+        var uploadVideo = new plupload.Uploader({
+            browse_button: "uploadVideoBtn",
+            url: "/users/uploadVideo"
+        });
+        uploadVideo.init();
+        uploadVideo.bind("FilesAdded", function (uploader, files) {
+            uploader.start();
+            $("#progress-detail").show();
+            var origSize = $.fn.filesize._humanize(files[0].origSize, {abbr: true})
+            $("#progress-detail .origSize").html(origSize)
+        });
+        uploadVideo.bind("UploadProgress", function (uploader, file) {
+            $("#progress").width(file.percent + "%")
+            var loaded = $.fn.filesize._humanize(file.loaded, {abbr: true})
+            var bytesPerSec = $.fn.filesize._humanize(uploader.total.bytesPerSec, {abbr: true})
+            $("#progress-detail .loaded").html(loaded)
+            $("#progress-detail .percent").html(file.percent + "%")
+            $("#progress-detail .bytesPerSec").html(bytesPerSec)
+        })
+        uploadVideo.bind("FileUploaded", function (uploader, file, responseObject) {
+            console.log(responseObject.response);
+            uploader.stop();
+            alert("上传完成")
+            $("#videoPoster").attr("src", responseObject.response)
+        });

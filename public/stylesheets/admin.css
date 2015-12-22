@@ -1,0 +1,50 @@
+.user-content{
+    -webkit-box-shadow: 0 0 3px #666 ;
+    -moz-box-shadow: 0 0 3px #666;
+    box-shadow: 0 0 3px #666;
+    width: 200px;
+    height: 90px;
+    display: inline-block;
+}
+.user-card-view{
+    float: left;
+    width: 100px;
+    height: 90px;
+    line-height: 90px;
+    font-size: 45px;
+    text-align: center;
+    color: whitesmoke;
+}
+.bg-red{
+    background-color: #f56954;
+}
+.bg-green{
+    background-color: #5cb85c;
+}
+.bg-yellow{
+    background-color: #f0ad4e;
+}
+.bg-blue{
+    background-color: #428bca;
+}
+.user-card-count{
+    float: left;
+    width: 100px;
+    height: 90px;
+    color: #666;
+    background-color: #ffffff;
+    padding:10px 0 0 15px ;
+}
+.margin-left-20{
+    margin-left: 20px;
+}
+.line-card{
+}
+.sysCard{
+    border: 1px solid#e3e3e3;
+    padding: 15px;
+    margin-left: 10px;
+    -webkit-box-shadow: 0 1px 1px #ddd ;
+    -moz-box-shadow: 0 1px 1px #ddd;
+    box-shadow: 0 1px 1px #ddd;
+}

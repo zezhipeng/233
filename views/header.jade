@@ -1,0 +1,45 @@
+include sign
+include reg
+.navbar.navbar-default.navbar-fixed-top
+      .container-fluid
+         .navbar-header.width-100
+            button.btn.btn-default.aside-btn.float-left
+               span.fa.fa-bars
+
+            a.navbar-brand(style="height:100%" href="/")
+               img(src="/images/logo.jpg" style="height:20px;margin-top:5px")
+            if auth
+               include userMenu
+            else
+               include signBtn
+
+.padding-0.asideMenu#nav2.padding-0
+      ul.nav.nav-pills.nav-stacked.aside
+         li
+            a 首页
+         li
+            a(href="/watch/list/channels") 热门
+         br
+         li
+            small.header 浏览类别
+         li
+            a(href="/watch/list/channels/娱乐") 娱乐
+         li
+            a(href="/watch/list/channels/会晤") 会晤
+         li
+            a(href="/watch/list/channels/医学咨询") 医学咨询
+
+         li
+            a(href="/watch/list/channels/远程教育") 远程教育
+         li
+            a(href="/watch/list/channels/云监控") 云监控
+script.
+   $(".aside-btn").click(function(){
+      $(".asideMenu").toggle(200)
+   })
+   $(document).ready(function () {
+      $(".aside li").click(function () {
+         $(".aside li").removeClass("newActive")
+         $(this).addClass("newActive")
+      })
+   })

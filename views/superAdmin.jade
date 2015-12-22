@@ -1,0 +1,164 @@
+extends adminLayout
+block content
+    include sign
+    include reg
+    link(href="/stylesheets/admin.css" rel="stylesheet")
+    script(src="/filesize/jquery.filesize.min.js")
+    script(src="/plupload/plupload.full.min.js")
+    .navbar.navbar-default.navbar-fixed-top
+        .container-fluid
+            .navbar-header.width-100(style="height:20px")
+                a.navbar-brand(style="height:100%" href="/")
+                    img(src="/images/logo.jpg" style="height:20px")
+                if auth
+                    include userMenu
+                else
+                    ul.userMenu.float-right
+                        li#theFace
+                            img(src=user.face style="width:28px;margin-top:-24px;")
+                        li.amdinMeun
+                            a= user.name
+                    .userCtrl(style="display:none;top:74px")
+                        img.img-circle(src=user.face style="width:90px;margin:10px 95px 0 95px;border:2px solid#666")
+                        input.border-radius-0.width-100( value=user.channels style="background-color:#333;border:0;text-align:center;color:#ccc;letter-spacing: 0;")
+                        p(style="color:#ccc;width:100%;text-align:center;margin-top:0;border:0") 串流码
+                        ul.user-body
+                            li
+                                small 粉丝
+                                small= user.fans.length
+                            li
+                                small 视频
+                                small= small = user.videos.length
+                            li
+                                a(href="/users/admin/follows")
+                                    small 关注
+                                    small= user.follows.length
+                        ul.user-footer(style="margin-top:-25px")
+                            li.float-left
+                                a(href="/users/admin/changeFace")
+                                    button.btn.btn-default.border-radius-0(style="margin-left:10px") 个人设置
+                            li.float-right
+                                a(href="/signOut")
+                                    button.btn.btn-default.border-radius-0(style="margin-right:10px") 注销
+                    script.
+                        $(".userMenu").click(function () {
+                            $(".userCtrl").toggle()
+                        })
+    .col-md-2.nav.nav-pills.nav-stacked
+        li.active
+            a(href="#") 总览
+    .col-md-10(ng-controller="adminCtrl" ng-init="number=50000")
+        ul.nav.nav-tabs
+            li.active
+                a(href="#total" data-toggle="tab") 总览
+            li
+                a(href="#users" data-toggle="tab") 用户
+            li
+                a(href="#other" data-toggle="tab") token
+        .tab-content.col-md-11
+            .tab-pane.active#total
+                .row
+                    .col-md-4.margin-top-10.padding-0
+                        ul.list-group
+                            li.list-group-item.list-group-item-success {{monitor.cpus[0].model}}
+                            li.list-group-item.list-group-item-heading
+                                h4.text-muted 内存
+                                    .progress
+                                        .progress-bar.progress-bar-primary(ng-style="{width:monitor.memory+'%'}")
+                                    h5.text-primary(style="margin-top:-10px") {{monitor.memory}}%
+                            li.list-group-item 用户总数:
+                                span.badge {{users.length}}
+                            li.list-group-item 频道总数:
+                                span.badge {{channels.length}}
+                            li.list-group-item 视频总数:
+                                span.badge {{videos.length}}
+                    .col-md-12.padding-0
+                        .panel.panel-default
+                            .panel-heading
+                                h4 服务器日志
+                                    small 以小时为单位
+                            .panel-body
+                                pre(style="max-height:500px;overflow:scroll")
+                                    code.log {{log}}
+            .tab-pane#users
+                table.table.table-striped.table-hover
+                    thead
+                        tr
+                            th #
+                            th 用户名
+                            th 邮箱
+                            th 电话
+                            th 直播权限
+                            th 注册时间
+                            th 修改
+                            th 删除
+                    tbody
+                        tr(ng-repeat="user in users|limitTo:number")
+                            td.text-success {{$index}}
+                            td.text-primary {{user.name}}
+                            td {{user.Email}}
+                            td {{user.phone}}
+                            td {{user.identify}}
+                            td {{user.regTime|date:'yyyy/MM/dd HH:mm'}}
+                            td
+                                a(href="#pencil" data-toggle="modal" ng-click="pencil(user)")
+                                    button.btn.btn-primary.btn-xs
+                                        span.fa.fa-pencil
+                            td
+                                button.btn.btn-danger.btn-xs(ng-click="handleDelete(user)")
+                                    span.fa.fa-trash
+
+                .modal#pencil
+                    .modal-dialog
+                        .modal-content(style="width:600px")
+                            .modal-header
+                            .modal-body
+                                .col-md-12
+                                    .col-md-3
+                                            img.img-responsive(ng-src="{{userUp.face}}")
+                                    .col-md-6
+                                            ul.list-group
+                                                li.list-group-item _id
+                                                    span.badge {{userUp._id}}
+                                                li.list-group-item uid
+                                                    span.badge {{userUp.uid}}
+                                                li.list-group-item 用户名
+                                                    span.badge {{userUp.name}}
+                                                li.list-group-item Email
+                                                    span.badge {{userUp.Email}}
+                                                li.list-group-item 电话
+                                                    span.badge {{userUp.phone}}
+                                                li.list-group-item 频道
+                                                    span.badge {{userUp.channels.length|| '无'}}
+                                                li.list-group-item 视频
+                                                    span.badge {{userUp.videos.length}}
+                                                li.list-group-item 直播权限
+                                                    select.badge.text-success(ng-model="userUp.identify")
+                                                            option 没有权限
+                                                            option 允许直播
+                                                li.list-group-item 生成token
+                                                    span.badge
+                                                        span.fa.fa-plus(ng-click="createToken(userUp._id)")
+
+
+                            .modal-footer
+                                button.btn.btn-default(data-dismiss="modal") Close
+                                button.btn.btn-primary(ng-click="userUpdate(userUp)") 保存修改
+            .tab-pane#other
+                table.table.table-striped.table-hover
+                    thead
+                        tr
+                            th #
+                            th token
+                            th 用户名
+
+                    tbody
+                        tr(ng-repeat="token in tokens|limitTo:number")
+                            td.text-success {{$index}}
+                            td.text-primary {{token.token}}
+                            td {{token.user.name}}
+
+
+
+
+
