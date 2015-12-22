@@ -7,7 +7,11 @@ block content
     .container
         each camera in cameras
             .col-md-6
-                    h5= camera.url
-                    video.video-js#video(controls preload="auto"   poster="/images/poster.jpg" data-setup="{}" width="600" height="400")
-                        source(src=camera.url type="rtmp/flv")
-
+                h5= camera.url
+                video.video-js(controls preload="auto"   poster="/images/poster.jpg" data-setup="{}" width="600" height="400")
+                    source(src=camera.url type="rtmp/flv")
+                script.
+                    var _id = "#{camera.url}"
+                    videojs("#"+_id)
+    script.
+        $(".video-js").width(600).height(400)
