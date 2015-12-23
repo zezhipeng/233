@@ -2,23 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d9297d5b-b562-4a76-8c10-827ed16f6939" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/HEAD" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/description" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/applypatch-msg.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/commit-msg.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/post-update.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/pre-applypatch.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/pre-commit.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/pre-push.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/pre-rebase.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/prepare-commit-msg.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/hooks/update.sample" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/info/exclude" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mongoose/users.js" afterPath="$PROJECT_DIR$/mongoose/users.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/userToken.js" afterPath="$PROJECT_DIR$/routes/userToken.js" />
     </list>
     <ignored path="seei.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -269,16 +253,24 @@
       <option name="number" value="Default" />
       <updated>1447916307145</updated>
     </task>
+    <task id="LOCAL-00001" summary="ddd">
+      <created>1450839214269</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1450839214269</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1295" height="728" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25373134" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25373134" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -303,6 +295,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="ddd" />
+    <option name="LAST_COMMIT_MESSAGE" value="ddd" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
