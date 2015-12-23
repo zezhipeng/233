@@ -166,5 +166,20 @@ router.delete("/videos/:_id",passport.authenticate('bearer', {session: false}),f
             }
         })
 });
+router.post("/messages/:_id",function(req,res){
+    req.body.user = req.user.name
+    method
+        .findByIdAndUpdate(req.params._id,{$push:{messages:req.body}})
+        .exec(function(err,cb){
+            res.json({err:err})
+        })
+});
+router.get("/messages",function(req,res){
+    method
+        .findByIdAndUpdate(req.user._id,{$set:{unread:false}})
+        .exec(function(err,cb){
+
+        })
+})
 module.exports = router;
 
