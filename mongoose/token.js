@@ -8,7 +8,7 @@ var tokenSchema = mongoose.Schema({
         return randtoken.generate(32)
     }},
     user:{type:mongoose.Schema.ObjectId,ref:"user",unique:true},
-    create:{type:Date,default:Date.now()}
+    create:{type:Date,default:Date.now}
 });
 
 tokenSchema.static("createToken" , function(user,cb){

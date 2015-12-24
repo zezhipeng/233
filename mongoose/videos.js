@@ -9,10 +9,10 @@ var videoSchema = mongoose.Schema({
     name:String,
     fileName:String,
     detail:{type:String,default:""},
-    uid:{type:Number,default:Date.now()},
+    uid:{type:Number,default:Date.now},
     title:String,
     poster:String,
-    createTime:{type:Date,default:Date.now()},
+    createTime:{type:Date,default:Date.now},
     like:{type:Number,default:0},
     public:{type:String,default:"公开"},
     charge:{type:String,default:"免费"},
@@ -27,7 +27,7 @@ var videoSchema = mongoose.Schema({
     ],
     comments:[{msg:String,
                 user:{type:mongoose.Schema.ObjectId,ref:"user"},
-                time:{type:Date,default:Date.now()}
+                time:{type:Date,default:Date.now}
     }]
 });
 videoSchema.static("getData",function(cb){
@@ -40,7 +40,10 @@ videoSchema.static("gen",function(_id,cb){
     console.log(_id)
     return this.find({parent:_id}).populate({path:"user",select:"name face uid"}).exec(cb)
 });
-videoSchema.plugin(deepPopulate,{populate:{"comments.user":{select:"name face"}}});
+videoSchema.static("search",function(find,filter,option,cb){
+    return this.find(find,filter,option).populate({path:"parent",select:"name face uid _id channels videos"}).exec(cb)
+})
+videoSchema.plugin(deepPopulate,{populate:{"comments.user":{select:"name face _id uid"}}});
 
 var video = mongoose.model("video",videoSchema);
 

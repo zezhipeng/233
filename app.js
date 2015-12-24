@@ -70,7 +70,7 @@ passport.use(new Strategy(
                      select:"_id name uid Email phone face follows fans regTime lv channels admin videos weibo address IdCard bank identify ipCamera messages"
             })
             .exec(function(err, user) {
-            console.log(err,user);
+            //console.log(err,user);
             if (err) { return cb(err); }
             if (!user) { return cb(null, false); }
             return cb(null, user.user);

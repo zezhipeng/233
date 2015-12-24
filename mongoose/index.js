@@ -16,6 +16,6 @@ var method = {
     lines:lines,
     official:official,
     ip:ip,
-    token:token
+    token:token,
     };
 exports.method = method;

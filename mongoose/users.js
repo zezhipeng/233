@@ -12,7 +12,7 @@ var userSchema = mongoose.Schema({
     face:{type:String,default:"/images/face.png"}, //头像url
     follows:[{type:mongoose.Schema.ObjectId,ref:"user"}],//关注
     fans:[{type:mongoose.Schema.ObjectId,ref:"user"}],//粉丝
-    regTime:{type:String,default:Date.now()},//注册时间
+    regTime:{type:String,default:Date.now},//注册时间
     lv:{type:Number,default:"1"},//等级
     regIp:String,//注册Ip
     channels:{type:mongoose.Schema.ObjectId,ref:"channel"},//频道
@@ -23,11 +23,13 @@ var userSchema = mongoose.Schema({
     IdCard:Number,//身份证号
     identify:{type:String,default:"没有权限"},//直播权限 ,"没有权限/允许直播"
     ipCamera:{type:Boolean,default:false},
-    messages:[{user:{type:mongoose.Schema.ObjectId,ref:"user"},//详细留言
+    messages:[
+        {user:{type:mongoose.Schema.ObjectId,ref:"user"},//详细留言
         msg:String,//留言
-        time:{type:Date,default:Date.now()},//时间
+        time:{type:Date,default:Date.now},//时间
         unRead:{type:Boolean,default:true},//是否阅读过
-    }]
+        }
+    ]
 });
 
 userSchema.static("getData",function(cb){
@@ -35,6 +37,9 @@ userSchema.static("getData",function(cb){
 });
 userSchema.static("getOne",function(_id,cb){
     return this.findById(_id).populate("channels videos").exec(cb)
+});
+userSchema.static("search",function(find,filter,option,cb){
+    return this.find(find,filter,option).select("name face uid _id channels videos").exec(cb)
 });
 
 var user = mongoose.model("user",userSchema);

@@ -372,4 +372,38 @@ router.get("/ipCamera", function (req, res) {
         res.render("ipCamera", {cameras: cameras})
     })
 })
+
+function options(options){
+    var objeact ={};
+    for(type in options){
+        if(type=="find"){
+
+        }
+        else{
+            switch (type)
+            {
+                case "limit":objeact[type]=parseInt(options[type]);
+                            break;
+                case "skip":objeact[type]=parseInt(options[type]);
+                            break;
+                case "sort":console.log(typeof options[type])
+                            objeact[type]=options[type]
+                            break;
+            }
+        }
+    }
+    return objeact
+}
+
+//search
+router.get("/search",function(req,res){
+   var v = options(req.query)
+   var find = new RegExp(req.query.find,"i")
+   method.method[req.query.collection]
+   .search({title:find},null,v)
+       .then(function(cb){
+       //console.log(cb)
+       res.json(cb)
+   })
+});
 module.exports = router;

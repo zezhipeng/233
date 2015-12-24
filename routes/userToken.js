@@ -11,6 +11,7 @@ var md5 = require("blueimp-md5").md5;
 var plupload = require('express-plupload').middleware
 var passport = require("passport");
 var Strategy = require("passport-http-bearer").Strategy;
+var _ = require("underscore");
 router.get("*", passport.authenticate('bearer', {session: false}), function (req, res, next) {
     if (req.user._id) {
         return next()
@@ -42,56 +43,56 @@ router.put("/basic", passport.authenticate('bearer', {session: false}), function
 });
 
 //获取我的频道
-router.get("/channels",passport.authenticate('bearer', {session: false}),function(req,res){
+router.get("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
-        .findOne({parent:req.user._id})
-        .exec(function(err,cb){
-            res.json({err:err,cb:cb})
+        .findOne({parent: req.user._id})
+        .exec(function (err, cb) {
+            res.json({err: err, cb: cb})
         })
 });
-router.post("/channels",passport.authenticate('bearer', {session: false}),function(req,res){
-   if(req.user.identify=="允许直播"){
-       new method.channels(req.body)
-           .save(function(err,cb){
-               if(!err){
-                   method.users
-                       .findByIdAndUpdate(req.user._id)
-                       .exec(function(err,callback){
-                           res.json({err:err,cb:cb})
-                       })
-               }
+router.post("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
+    if (req.user.identify == "允许直播") {
+        new method.channels(req.body)
+            .save(function (err, cb) {
+                if (!err) {
+                    method.users
+                        .findByIdAndUpdate(req.user._id)
+                        .exec(function (err, callback) {
+                            res.json({err: err, cb: cb})
+                        })
+                }
 
-           })
-   }
-   else{
-       res.json({err:"用户没有权限",cb:null})
-   }
+            })
+    }
+    else {
+        res.json({err: "用户没有权限", cb: null})
+    }
 });
-router.put("/channels",passport.authenticate('bearer', {session: false}),function(req,res){
+router.put("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
-        .findOneAndUpdate({parent:req.user._id},req.body)
-        .exec(function(err,cb){
+        .findOneAndUpdate({parent: req.user._id}, req.body)
+        .exec(function (err, cb) {
             method.channels
-                .findOne({parent:req.user._id})
-                .exec(function(err,cb){
-                    res.json({err:err,cb:cb})
+                .findOne({parent: req.user._id})
+                .exec(function (err, cb) {
+                    res.json({err: err, cb: cb})
                 })
         })
 });
-router.delete("/channels",passport.authenticate('bearer', {session: false}),function(req,res){
+router.delete("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
-        .findOneAndRemove({parent:req.user._id})
-        .exec(function(err,cb){
-            console.log(err,cb)
-            if(!err){
+        .findOneAndRemove({parent: req.user._id})
+        .exec(function (err, cb) {
+            console.log(err, cb)
+            if (!err) {
                 method.users
-                    .findByIdAndUpdate(req.user._id,{$unset:{channels:req.user.channels}})
-                    .exec(function(err,cb){
-                        res.json({err:err,cb:cb})
+                    .findByIdAndUpdate(req.user._id, {$unset: {channels: req.user.channels}})
+                    .exec(function (err, cb) {
+                        res.json({err: err, cb: cb})
                     })
             }
-            else{
-                res.json({err:"频道不存在",cb:null})
+            else {
+                res.json({err: "频道不存在", cb: null})
             }
         })
 });
@@ -136,7 +137,7 @@ router.put("/videos/:_id", passport.authenticate('bearer', {session: false}), fu
     var video = req.body;
     video.parent = req.user._id;
     method.videos
-        .findByIdAndUpdate(req.params._id,video)
+        .findByIdAndUpdate(req.params._id, video)
         .exec(function (err, cb) {
             res.json({err: err, cb: cb})
         })
@@ -150,36 +151,72 @@ router.get("/videos", passport.authenticate('bearer', {session: false}), functio
             res.json(cb)
         })
 });
-router.delete("/videos/:_id",passport.authenticate('bearer', {session: false}),function(req,res){
+router.delete("/videos/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
-        .findOneAndRemove({_id:req.params._id})
-        .exec(function(err,cb){
-            if(!err){
+        .findOneAndRemove({_id: req.params._id})
+        .exec(function (err, cb) {
+            if (!err) {
                 method.users
-                    .findByIdAndUpdate(req.user._id,{$unset:{videos:req.params._id}})
-                    .exec(function(err,cb){
-                        res.json({err:err,cb:cb})
+                    .findByIdAndUpdate(req.user._id, {$unset: {videos: req.params._id}})
+                    .exec(function (err, cb) {
+                        res.json({err: err, cb: cb})
                     })
             }
-            else{
-                res.json({err:"未找到该视频",cb:null})
+            else {
+                res.json({err: "未找到该视频", cb: null})
             }
         })
 });
-router.post("/messages/:_id",function(req,res){
-    req.body.user = req.user.name
-    method
-        .findByIdAndUpdate(req.params._id,{$push:{messages:req.body}})
-        .exec(function(err,cb){
-            res.json({err:err})
+router.post("/messages/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
+    method.users
+        .findByIdAndUpdate(req.params._id, {$push: {messages: {user: req.user._id, msg: req.body.msg}}})
+        .exec(function (err, cb) {
+            res.json({err: err})
         })
 });
-router.get("/messages",function(req,res){
-    method
-        .findByIdAndUpdate(req.user._id,{$set:{unread:false}})
-        .exec(function(err,cb){
-
+router.get("/messages", passport.authenticate('bearer', {session: false}), function (req, res) {
+    method.users
+        .findById(req.user._id)
+        .populate({path: "messages.user", select: "name _id face uid channels videos"})
+        .exec(function (err, cb) {
+            if (cb) {
+                res.json(cb.messages)
+            }
         })
+});
+router.get("/messages/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
+    method.users
+        .findOneAndUpdate({"messages._id": req.params._id}, {$set: {"messages.$.unRead": false}})
+        .populate({path: "messages.user", select: "name face _id uid Email channels videos"})
+        .exec()
+        .then(function(cb){
+            if (cb&&cb.messages) {
+                var message = _.find(cb.messages, function (v) {
+                    return v._id == req.params._id
+                })
+                return message
+            }
+            else{
+                res.json(null)
+            }
+        })
+        .then(function(cb){
+            method.users
+                .find({"messages.user":{$in:[req.user._id,cb.user._id]}})
+                .select("messages")
+                .populate({path: "messages.user", select: "name face _id uid Email channels videos"})
+                .exec()
+                .then(function(callback){
+                    var messages =_.union(callback[0].messages,callback[1].messages)
+                    messages = _.sortBy(_.filter(messages,function(v){
+                        return v.user.name==req.user.name||v.user.name==cb.user.name
+                    }),function(msg){
+                        return msg.time
+                    })
+                    res.json(messages)
+                })
+        })
+
 })
 module.exports = router;
 
