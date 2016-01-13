@@ -20,6 +20,10 @@ router.get("*", passport.authenticate('bearer', {session: false}), function (req
         res.send(404)
     }
 });
+
+//这里通过passport传进来req.user
+//为app.js里面查询到的相关用户信息
+
 //基本信息
 router.get("/basic", passport.authenticate('bearer', {session: false}), function (req, res) {
     res.json(req.user)
@@ -50,8 +54,9 @@ router.get("/channels", passport.authenticate('bearer', {session: false}), funct
             res.json({err: err, cb: cb})
         })
 });
+//创建频道
 router.post("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
-    if (req.user.identify == "允许直播") {
+    if (req.user.identify == "允许直播") {//首先判断用户是否有权限创建一个新的频道
         new method.channels(req.body)
             .save(function (err, cb) {
                 if (!err) {
@@ -68,6 +73,7 @@ router.post("/channels", passport.authenticate('bearer', {session: false}), func
         res.json({err: "用户没有权限", cb: null})
     }
 });
+//更新频道
 router.put("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
         .findOneAndUpdate({parent: req.user._id}, req.body)
@@ -79,14 +85,15 @@ router.put("/channels", passport.authenticate('bearer', {session: false}), funct
                 })
         })
 });
+//删除频道
 router.delete("/channels", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
-        .findOneAndRemove({parent: req.user._id})
+        .findOneAndRemove({parent: req.user._id})//从channels集合中删除
         .exec(function (err, cb) {
             console.log(err, cb)
             if (!err) {
                 method.users
-                    .findByIdAndUpdate(req.user._id, {$unset: {channels: req.user.channels}})
+                    .findByIdAndUpdate(req.user._id, {$unset: {channels: req.user.channels}})//从用户集合中删除
                     .exec(function (err, cb) {
                         res.json({err: err, cb: cb})
                     })
@@ -100,19 +107,21 @@ router.delete("/channels", passport.authenticate('bearer', {session: false}), fu
 router.post("/uploadVideo", passport.authenticate('bearer', {session: false}), function (req, res) {
     var video = req.files;
     console.log(video)
-    var appPath = process.cwd();
-    var _path = appPath + "/public/video/" + video.file.name;
-    video.size = filesize(video.size).human('jedec');
-    fs.rename(video.file.path, _path, function (err) {
+    var appPath = process.cwd();//这个文件路径
+    var _path = appPath + "/public/video/" + video.file.name;//保存的视频文件路径
+    video.size = filesize(video.size).human('jedec');//文件大小格式化
+    fs.rename(video.file.path, _path, function (err) {//上传视频后截图
         ffmpeg(_path)
             .screenshots({
-                timestamps: ['50%'],
+                timestamps: ['50%'],//视频50%处截图
                 filename: video.file.name + '.jpg',
                 folder: appPath + "/public/video",
-                size: '640x380'
+                size: '640x380'//图片分辨率
             })
             .on('end', function () {
+                //文件名，以后用前端md5计算后上传，可以确定文件的唯一性，可以实现秒传等功能
                 video.file.fileName = video.file.name;
+                //视频截图地址
                 video.file.poster = "/video/" + video.file.name + '.jpg';
                 res.send(video.file)
             })
@@ -151,6 +160,7 @@ router.get("/videos", passport.authenticate('bearer', {session: false}), functio
             res.json(cb)
         })
 });
+//删除视频
 router.delete("/videos/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.channels
         .findOneAndRemove({_id: req.params._id})
@@ -167,6 +177,8 @@ router.delete("/videos/:_id", passport.authenticate('bearer', {session: false}),
             }
         })
 });
+
+//发送消息
 router.post("/messages/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.users
         .findByIdAndUpdate(req.params._id, {$push: {messages: {user: req.user._id, msg: req.body.msg}}})
@@ -174,6 +186,8 @@ router.post("/messages/:_id", passport.authenticate('bearer', {session: false}),
             res.json({err: err})
         })
 });
+
+//查询消息
 router.get("/messages", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.users
         .findById(req.user._id)
@@ -184,31 +198,33 @@ router.get("/messages", passport.authenticate('bearer', {session: false}), funct
             }
         })
 });
+
+//查询对应的历史对话
 router.get("/messages/:_id", passport.authenticate('bearer', {session: false}), function (req, res) {
     method.users
-        .findOneAndUpdate({"messages._id": req.params._id}, {$set: {"messages.$.unRead": false}})
+        .findOneAndUpdate({"messages._id": req.params._id}, {$set: {"messages.$.unRead": false}})//更新为已读信息
         .populate({path: "messages.user", select: "name face _id uid Email channels videos"})
         .exec()
-        .then(function(cb){
+        .then(function(cb){//查询这个此条信息
             if (cb&&cb.messages) {
                 var message = _.find(cb.messages, function (v) {
                     return v._id == req.params._id
                 })
-                return message
+                return message//把查询结果传到下个then
             }
             else{
                 res.json(null)
             }
         })
-        .then(function(cb){
+        .then(function(cb){//根据上面查询到的信息，查询两个人的对话
             method.users
                 .find({"messages.user":{$in:[req.user._id,cb.user._id]}})
                 .select("messages")
                 .populate({path: "messages.user", select: "name face _id uid Email channels videos"})
                 .exec()
                 .then(function(callback){
-                    var messages =_.union(callback[0].messages,callback[1].messages)
-                    messages = _.sortBy(_.filter(messages,function(v){
+                    var messages =_.union(callback[0].messages,callback[1].messages)//合并查询结果
+                    messages = _.sortBy(_.filter(messages,function(v){//根据时间排序
                         return v.user.name==req.user.name||v.user.name==cb.user.name
                     }),function(msg){
                         return msg.time

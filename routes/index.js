@@ -11,13 +11,16 @@ var request = require("request");
 //_official.save()
 
 //注册
+//登录
+//先密码md5，然后查询数据库，进行对比查询,看用户是否存在
+//之后生成一个token
 router.post("/reg", function (req, res) {
     method.method.official
-        .findOneAndUpdate({name: "adinno"},{$inc:{userCount:1}})
+        .findOneAndUpdate({name: "adinno"}, {$inc: {userCount: 1}})//总用户数+1
         .exec(function (err, cb) {
             req.body.uid = cb.userCount;
-            req.body.password = md5(req.body.password, "adinno");
-            var _user = new method.method.users(req.body);
+            req.body.password = md5(req.body.password, "adinno");//密码md5加密
+            var _user = new method.method.users(req.body);//实例化user
             _user
                 .save(function (err, cb) {
                     if (err) {
@@ -26,7 +29,7 @@ router.post("/reg", function (req, res) {
                     else {
                         req.session.user = cb;
                         req.session.auth = true;
-                        new method.method.token({user: _user._id})
+                        new method.method.token({user: _user._id})  //生成token
                             .save(function (err, cb) {
                                 res.json({err: err, token: cb.token});
                                 console.log(cb)
@@ -38,26 +41,30 @@ router.post("/reg", function (req, res) {
 });
 
 //登录
+//先密码md5，然后查询数据库，进行对比查询,
+//之后查询这个用户是否有token，没有的话就生成一个
 router.post("/sign", function (req, res) {
     //console.log(req.body);
-    req.body.password = md5(req.body.password, "adinno");
+    req.body.password = md5(req.body.password, "adinno");//密码md5加密
     method.method.users
         .findOne(req.body)
         .exec(function (err, cb) {
             if (cb) {
                 req.session.auth = true;
                 req.session.user = cb;
-                method.method.token.findOne({user: cb._id}).exec(function (err, callback) {
-                    if (callback) {
-                        res.json({err: err, token: callback.token})
-                    }
-                    else {
-                        new method.method.token({user: cb._id})
-                            .save(function (err, cb) {
-                                res.json({err: err, token: cb.token});
-                            })
-                    }
-                })
+                method.method.token//查询token，有的话就响应，没有的话就生成一个
+                    .findOne({user: cb._id})
+                    .exec(function (err, callback) {
+                        if (callback) {
+                            res.json({err: err, token: callback.token})
+                        }
+                        else {
+                            new method.method.token({user: cb._id})//生成token
+                                .save(function (err, cb) {
+                                    res.json({err: err, token: cb.token});
+                                })
+                        }
+                    })
             }
             else {
                 res.json({err: "用户名或密码错误", token: null})
@@ -71,6 +78,7 @@ router.get("/signOut", function (req, res) {
 });
 
 //首页
+//查询videos和channels
 router.get('/', function (req, res, next) {
     var _videos = method.method.videos
         .find({public: "公开"})
@@ -205,7 +213,7 @@ router.get("/live/:uid", function (req, res) {
                 //req.session.channelId = cb.channels._id;
                 //req.session.bc = cb._id;
                 method.method.lines
-                    .find({status: "ready"})
+                    .find({status: "ready"})//返回状态为ready的线路
                     .exec(function (err, lines) {
                         //console.log(cb,lines);
                         res.render("live", {
@@ -215,7 +223,7 @@ router.get("/live/:uid", function (req, res) {
                                 lines: lines,
                                 channels: cb.channels,
                                 uid: uid,
-                                live:cb,
+                                live: cb,
                                 videos: cb.videos
                             }
                         )
@@ -224,7 +232,9 @@ router.get("/live/:uid", function (req, res) {
 
         });
 });
+//直播详情
 router.get("/liveDetail/:_id", function (req, res) {
+    //直播页面打开后，前端请求获取直播页面的具体信息
     var uid = req.params._id;
     //console.log("uid:=",uid)
     var _user = method.method.users
@@ -249,12 +259,12 @@ router.get("/lines", function (req, res) {
 router.get("/test", function (req, res) {
     res.render("test")
 });
-//获取视频信息
+//获取视频
 router.get("/video/:videoId", function (req, res) {
     var videoId = req.params.videoId;
-    req.session.videoId = videoId;
+    req.session.videoId = videoId;//session里面保存当前的频道id，为socket里面可以调用当前视频id留的借口
     var _video = method.method.videos
-        .findByIdAndUpdate(videoId, {$inc: {views: 1}})
+        .findByIdAndUpdate(videoId, {$inc: {views: 1}})//每次点击后观看人数+1
         .populate({
             path: "parent",
             select: "name uid face fans follows regTime channels videos weibo"
@@ -262,10 +272,10 @@ router.get("/video/:videoId", function (req, res) {
         .exec();
     _video
         .then(function (cb) {
-            method.method.lines
+            method.method.lines//查询可用线路
                 .find({status: "ready"})
                 .exec(function (err, lines) {
-                    method.method.videos
+                    method.method.videos//查询相关的视频，作为前端的ui，视频列表
                         .find()
                         .populate("parent")
                         .sort({views: -1})
@@ -291,7 +301,7 @@ router.get("/comments/:_id", function (req, res) {
             res.json(cb.comments)
         })
 });
-
+//视频和频道的相关集合列表页面
 router.get("/watch/list/:collection/:group", function (req, res) {
     //console.log(method.method[req.params.collection]);
     method.method[req.params.collection]
@@ -313,14 +323,16 @@ router.get("/watch/list/:collection/:group", function (req, res) {
         });
 });
 
-
+//视频和频道的列表页面
 router.get("/watch/list/:collection", function (req, res) {
+    //查询相关集合中public为公开的数据
     method.method[req.params.collection]
         .find({public: "公开"})
         .populate({
             path: "parent",
             select: "name uid face fans follows regTime channels videos weibo"
         })
+        //降序排列
         .sort({viewers: -1, views: -1})
         .exec(function (err, cb) {
             //console.log(cb)
@@ -337,11 +349,12 @@ router.get("/about", function (req, res) {
     res.render("about")
 });
 
-//定位
+//定位api
 router.get("/location", function (req, res) {
     var ip = req.ip.slice(7);
 
     function requestQ(ip) {
+        //利用百度的地位api，根据ip获取地址,promise方法定义
         return new Promise(function (fulfill, reject) {
             request.get("http://api.map.baidu.com/location/ip?ak=4zzMYIt7cBkcgnKgjwR8XwRQ&coor=bd09ll&ip=" + ip, function (err, res, body) {
                 if (err) {
@@ -360,7 +373,9 @@ router.get("/location", function (req, res) {
     })
 });
 
+//ipcamera的api
 router.get("/ipCamera", function (req, res) {
+    //对ipCamera服务器进行POST请求，把响应的渲染为视图
     request.post({
         url: 'http://zyhh123.eicp.net:9000/GetListUrl.json',
         content: "admin"
@@ -372,23 +387,23 @@ router.get("/ipCamera", function (req, res) {
         res.render("ipCamera", {cameras: cameras})
     })
 })
-
-function options(options){
-    var objeact ={};
-    for(type in options){
-        if(type=="find"){
-
-        }
-        else{
-            switch (type)
-            {
-                case "limit":objeact[type]=parseInt(options[type]);
-                            break;
-                case "skip":objeact[type]=parseInt(options[type]);
-                            break;
-                case "sort":console.log(typeof options[type])
-                            objeact[type]=options[type]
-                            break;
+//搜索api的相关函数，主要解析请求把对应的请求的类型进行转换
+function options(options) {
+    var objeact = {};
+    for (type in options) {
+        if (type != "find") {
+            switch (type) {
+                case "limit":
+                    objeact[type] = parseInt(options[type]);//转为number
+                    break;
+                case "skip":
+                    objeact[type] = parseInt(options[type]);//转为number
+                    break;
+                case "sort":
+                    console.log(typeof options[type])
+                    objeact[type] = options[type]//排序无需转换，直接用string类型
+                    break;
+                default:break;
             }
         }
     }
@@ -396,14 +411,16 @@ function options(options){
 }
 
 //search
-router.get("/search",function(req,res){
-   var v = options(req.query)
-   var find = new RegExp(req.query.find,"i")
-   method.method[req.query.collection]
-   .search({title:find},null,v)
-       .then(function(cb){
-       //console.log(cb)
-       res.json(cb)
-   })
+
+//相关api设置可查询文档
+router.get("/search", function (req, res) {
+    var v = options(req.query)
+    var find = new RegExp(req.query.find, "i")//转换为正则类型
+    method.method[req.query.collection]
+        .search({title: find}, null, v)
+        .then(function (cb) {
+            //console.log(cb)
+            res.json(cb)
+        })
 });
 module.exports = router;

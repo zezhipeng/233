@@ -6,35 +6,37 @@ var api = require("./routes/api");
 var token = require("./routes/token");
 var userToken = require("./routes/userToken");
 var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
+var favicon = require('serve-favicon');//图标中间件
+var logger = require('morgan');//日志中间件
 var methodOverride = require('method-override');
-var session = require('express-session');
-var passport = require("passport");
-var Strategy = require("passport-http-bearer").Strategy;
+var session = require('express-session');//session中间件
+var passport = require("passport"); //passport依赖,用于token
+var Strategy = require("passport-http-bearer").Strategy; //token依赖
 var fs= require("fs")
-var accessLogStream = fs.createWriteStream(__dirname+"/public/log/"+parseInt(Date.now()/1000/3600/24)+".log")
+var accessLogStream = fs.createWriteStream(__dirname+"/public/log/"+parseInt(Date.now()/1000/3600/24)+".log")//定时保存日志
 var bodyParser = require('body-parser');
-var multer = require('multer');
+var multer = require('multer');//上传文件中间件
 var errorHandler = require('errorhandler');
-var config = require("./config");
+var config = require("./config");  //主要的配置文件中间件
 var mongoose = require("mongoose");
-var mongoStore = require("connect-mongo")(session);
+var mongoStore = require("connect-mongo")(session);//mongodb session中间件
 mongoose.connect(config.dbUrl);
 var method = require("./mongoose/index.js");
 var ws = require("./socket");
 var db = mongoose.connection;
 var nodemailer = require('nodemailer');
 
-
+//连接数据库成功后响应
 db.once("open", function () {
     console.log("db connect")
 });
-
+//session关于mongodb的配置,session时效7天
 var store = new mongoStore({
     mongooseConnection: db,
     ttl: 7 * 24 * 60 * 60
 });
+
+//seesion配置
 var _session = session({
     resave: true,
     saveUninitialized: true,
@@ -48,6 +50,8 @@ app.set('port', process.env.PORT || 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 //app.use(favicon(__dirname + '/public/favicon.ico'));
+
+//一堆中间件
 app.use(logger('dev'));
 app.use(methodOverride());
 app.use(logger(':remote-addr :date[web] :url',{stream: accessLogStream}));
@@ -61,7 +65,11 @@ app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 config.middleware(app);
+
+//token中间件的配置
 passport.use(new Strategy(
     function(token, cb) {
         method.method.token
@@ -95,7 +103,7 @@ app.use(function (req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
-      ;
+
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -117,6 +125,8 @@ app.use(function (err, req, res, next) {
 
 
 var server = http.createServer(app);
+
+//socket监听
 ws.listen(server);
 
 

@@ -3,18 +3,116 @@ html(ng-app="todo" )
     head
         title SEEI.TV嘻爱网
         meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(http-equiv="X-UA-Compatible" content="IE=edge")
         link(rel='stylesheet', href='/bootstrap/dist/css/bootstrap.min.css')
-        link(rel='stylesheet', href='/video.js/dist/video-js.min.css')
         link(rel="stylesheet", href="/font-awesome/css/font-awesome.min.css")
         link(rel='stylesheet', href='/stylesheets/style.css')
         link(rel="stylesheet" href="/stylesheets/animate.min.css")
-        script(src="/jquery/dist/jquery.min.js")
+        script(src="/jquery/dist/jquery.js")
         script(src="/bootstrap/dist/js/bootstrap.min.js")
-        script(src="/angular/angular.min.js")
-        script(src="/js/app.js")
-    body(style="padding-top:75px")
-        h1 test
-        div(ng-controller="indexCtrl")
-            button(ng-click="get()" ) tijiao
+        script(src="socket.io/socket.io.js")
+        script(src="/record/dist/recorder.js")
+        script(src="/audio/index.js")
+        script.
+            $('body').scrollspy({ target: '#navbar-example' })
+        style.
+            .test{
+                height: 500px;
+                width: 400px;
+                margin: 50px;
+                border:1px solid#e3e3e3;
+                background-color: #666;
+                opacity: 0;
+            }
+            .change {
+                opacity: 1;
+                animation: fadeIn 1s;
+            }
+
+body(style="padding-top:75px" data-spy="scroll" data-target="#navbar-example")
+        nav.navbar.navbar-default.navbar-fixed-top
+            .container-fluid
+                .navbar-header
+                .collapse.navbar-collapse
+                    ul.nav.navbar-nav#navbar-example
+                        li.sroll
+                            a(href="#111" ) 111
+                        li.sroll
+                            a(href="#222" ) 222
+                        li.sroll
+                            a(href="#333" ) 333
+                        li.sroll
+                            a(href="#444" ) 444
+
+        button(onclick="startRecording(this);") record
+        button(onclick="stopRecording(this);" disabled) stop
+
+        ul#recordingslist
+
+
+        script.
+            var socket =io()
+            var audio_context;
+            var recorder;
+
+            var audio = require('audio');
+            var el = document.querySelector('audio');
+            audio(el);
+            $(".play").click(function () {
+                console.log("11")
+                var audio =$(this).find("audio").each(function(){
+                    console.log("222")
+                    $(this)[0].play()
+                })
+            })
+            function startUserMedia(stream) {
+                var input = audio_context.createMediaStreamSource(stream);
+                recorder = new Recorder(input);
+            }
+
+            function startRecording(button) {
+                recorder && recorder.record();
+                button.disabled = true;
+                button.nextElementSibling.disabled = false;
+            }
+
+            function stopRecording(button) {
+                recorder && recorder.stop();
+                button.disabled = true;
+                button.previousElementSibling.disabled = false;
+                recorder.exportWAV(function(blob){
+                    setTimeout(function () {
+                        socket.emit("audio", blob)
+                        recorder.clear();
+                    }, 1000)
+                })
+
+            }
+
+            socket.on("audio",function(src){
+                //var audio = document.getElementById("audio")
+                $("#recordingslist").append("<li class='play'><button class='btn btn-danger '>play</button><audio class='audio' id='test' controls></audio></li>")
+                var audio = document.getElementById("test")
+                audio.src=src
+
+            })
+            window.onload = function init() {
+                try {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    navigator.getUserMedia = navigator.getUserMedia ||
+                            navigator.webkitGetUserMedia ||
+                            navigator.mozGetUserMedia;
+                    window.URL = window.URL || window.webkitURL;
+
+                    audio_context = new AudioContext;
+
+                } catch (e) {
+                }
+
+                navigator.getUserMedia({audio: true}, startUserMedia, function (e) {
+
+                });
+            };
+

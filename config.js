@@ -9,6 +9,7 @@ var config = {
     //dbUrl:"mongodb://adinno:123123@localhost/demo",
     dbUrl:"mongodb://localhost/demo",
     middleware: function (app) {
+        //域名绑定
         //app.all("/*",function(req,res,next){
         //  if(req.hostname=="www.seei.tv" || req.hostname=="seei.tv"){
         //      console.log(req.hostname)
@@ -18,6 +19,7 @@ var config = {
         //    res.render("error",{error:404})
         //  }
         //})
+        //保存ip地址
         app.all("/live/*", function (req, res, next) {
             if (req.session.auth && req.session.user._id) {
                 _ip = new method.method.ip({ip: req.ip, user: req.session.user._id});
@@ -29,6 +31,7 @@ var config = {
             }
             return next()
         });
+        //需要以及登陆
         app.all("/users/*", function (req, res, next) {
             if (req.session.auth) {
                 return next()
@@ -37,6 +40,7 @@ var config = {
                 res.render("error")
             }
         });
+        //需要管理员权限
         app.all("/api/*", function (req, res, next) {
             if (req.session.auth && req.session.user.admin) {
                 return next()

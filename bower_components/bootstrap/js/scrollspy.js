@@ -62,7 +62,8 @@
         var href  = $el.data('target') || $el.attr('href')
         var $href = /^#./.test(href) && $(href)
 
-        return ($href
+        return (
+            $href
           && $href.length
           && $href.is(':visible')
           && [[$href[offsetMethod]().top + offsetBase, href]]) || null
@@ -84,6 +85,7 @@
     var i
 
     if (this.scrollHeight != scrollHeight) {
+
       this.refresh()
     }
 
